@@ -1,4 +1,7 @@
 package com.example.chatapp.datas.models
 
-class User {
-}
+data class User(
+    var name: String,
+    var avatar: String,
+    var isActive: Boolean
+)

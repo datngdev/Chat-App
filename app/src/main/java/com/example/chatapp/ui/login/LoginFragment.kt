@@ -1,60 +1,87 @@
-package com.example.chatapp.ui.Login
+package com.example.chatapp.ui.login
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.chatapp.R
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.example.chatapp.databinding.FragmentLoginBinding
+import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LoginFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    companion object {
+        fun newInstance(callBack: LoginFragmentCallBack): LoginFragment {
+            return LoginFragment().apply {
+                this.callBack = callBack
+            }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+    interface LoginFragmentCallBack {
+        fun navigateToHome()
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LoginFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LoginFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+
+    private var callBack: LoginFragmentCallBack? = null
+    private val loginViewModel: LoginViewModel by viewModels()
+    private val loginSharedPreference = LoginSharedPreference()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnLogin.setOnClickListener {
+            val userId = binding.editTextUsername.text.toString()
+            Log.d("ChatApp", "UserId: $userId")
+
+            loginViewModel.isExistUser(userId).observe(viewLifecycleOwner) {
+                if(it) {
+                    Log.d("ChatApp", "User exist")
+                    login(userId)
+                } else {
+                    loginViewModel.registerUser(userId).observe(viewLifecycleOwner) { it ->
+                        if (it) {
+                            Log.d("ChatApp", "Register User with id: $userId")
+                            login(userId)
+                        } else {
+                            Log.d("ChatApp", "Register User fail")
+                            Toast.makeText(context, "Register User fail", Toast.LENGTH_SHORT)
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    private fun login(userId: String) {
+        loginViewModel.login(userId).observe(viewLifecycleOwner) {
+            if(it) {
+                Log.d("ChatApp", "Login Success")
+                loginSharedPreference.updateLoginStatus(requireContext(), userId)
+                callBack!!.navigateToHome()
+            } else {
+                Log.d("ChatApp", "Login fail")
+                Toast.makeText(context, "Login fail", Toast.LENGTH_SHORT)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
