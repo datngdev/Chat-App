@@ -9,13 +9,23 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class UserRepository {
+
+interface UserRepository {
+    fun isExistUser(userId: String): StateFlow<Boolean?>
+    fun registerUser(userId: String): LiveData<Boolean>
+    fun login(userId: String): LiveData<Boolean>
+    fun logout(userId: String)
+}
+
+class UserRepositoryImpl : UserRepository {
     private val db = Firebase.database
     private val userRef = db.getReference("users")
 
-    fun isExistUser(userId: String): LiveData<Boolean> {
-        val isExistUserState = MutableLiveData<Boolean>()
+    override fun isExistUser(userId: String): StateFlow<Boolean?> {
+        val isExistUserState = MutableStateFlow<Boolean?>(null)
 
         db.reference.child("users").addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -30,7 +40,7 @@ class UserRepository {
         return isExistUserState
     }
 
-    fun registerUser(userId: String): LiveData<Boolean> {
+    override fun registerUser(userId: String): LiveData<Boolean> {
         val registerState = MutableLiveData<Boolean>()
 
         val defaultAvatar = "defaultAvatar.jpg"
@@ -43,7 +53,7 @@ class UserRepository {
         return registerState
     }
 
-    fun login(userId: String): LiveData<Boolean> {
+    override fun login(userId: String): LiveData<Boolean> {
         val loginState = MutableLiveData<Boolean>()
 
         userRef.child(userId).child("active").setValue("true").addOnSuccessListener {
@@ -54,7 +64,7 @@ class UserRepository {
         return loginState
     }
 
-    fun logout(userId: String) {
+    override fun logout(userId: String) {
         userRef.child(userId).child("active").setValue("false")
 //        userRef.child(userId).child("active").setValue("false").addOnSuccessListener {
 //            _logoutState.value = true
