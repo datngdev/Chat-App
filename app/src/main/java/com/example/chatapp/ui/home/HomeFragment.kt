@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import com.example.chatapp.databinding.FragmentHomeBinding
 import com.example.chatapp.datas.repositories.UserRepository
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
+import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
 
 class HomeFragment : Fragment() {
     companion object {
@@ -28,7 +29,7 @@ class HomeFragment : Fragment() {
 
     private var callBack: HomeFragmentCallBack? = null
     private val homeViewModel: HomeViewModel by viewModels()
-    private val loginSharedPreference = LoginSharedPreference()
+    private val loginSharedPreference: LoginSharedPreference = LoginSharedPreferenceImpl()
 
     override fun onCreateView(
         inflater: LayoutInflater,
