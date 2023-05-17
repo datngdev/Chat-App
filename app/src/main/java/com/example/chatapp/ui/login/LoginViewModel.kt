@@ -1,16 +1,13 @@
 package com.example.chatapp.ui.login
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.datas.repositories.UserRepository
 import com.example.chatapp.datas.repositories.UserRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -28,6 +25,7 @@ class LoginViewModel : ViewModel() {
             }
         }
         return loginState
+
     }
 
     private suspend fun registerAndLogin(userId: String) {
