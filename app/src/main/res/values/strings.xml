@@ -7,4 +7,5 @@
     <string name="username">username</string>
     <string name="login_button">LOGIN</string>
     <string name="logout">LOGOUT</string>
+    <string name="home_fragment">Home Fragment</string>
 </resources>
