@@ -34,13 +34,15 @@ class LoginFragment : Fragment() {
 
     private var callBack: LoginFragmentCallBack? = null
     private val loginViewModel: LoginViewModel by viewModels()
-    private val loginSharedPreference: LoginSharedPreference = LoginSharedPreferenceImpl()
+
+    private lateinit var loginSharedPreference: LoginSharedPreference
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        loginSharedPreference = LoginSharedPreferenceImpl(requireContext())
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,7 +57,7 @@ class LoginFragment : Fragment() {
             lifecycleScope.launch {
                 loginViewModel.processLogin(userId).collect {
                     if(it == true) {
-                        loginSharedPreference.updateLoginStatus(requireContext(), userId)
+                        loginSharedPreference.updateLoginStatus(userId)
                         callBack!!.navigateToHome()
                     } else if (it == false) {
                         Toast.makeText(context, "Login Fail", Toast.LENGTH_SHORT)

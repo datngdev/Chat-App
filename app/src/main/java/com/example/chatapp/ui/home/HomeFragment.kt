@@ -29,13 +29,14 @@ class HomeFragment : Fragment() {
 
     private var callBack: HomeFragmentCallBack? = null
     private val homeViewModel: HomeViewModel by viewModels()
-    private val loginSharedPreference: LoginSharedPreference = LoginSharedPreferenceImpl()
+    private lateinit var loginSharedPreference: LoginSharedPreference
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        loginSharedPreference = LoginSharedPreferenceImpl(requireContext())
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,12 +44,12 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentUser = loginSharedPreference.getCurrentUserId(requireContext())!!
+        val currentUser = loginSharedPreference.getCurrentUserId()!!
         binding.txtHome.text = currentUser
 
         binding.btnLogout.setOnClickListener {
             homeViewModel.logout(currentUser)
-            loginSharedPreference.logout(requireContext())
+            loginSharedPreference.logout()
             callBack!!.navigateToLogin()
         }
     }
