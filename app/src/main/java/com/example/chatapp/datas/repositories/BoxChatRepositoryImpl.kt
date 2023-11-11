@@ -23,7 +23,7 @@ class BoxChatRepositoryImpl : BoxChatRepository {
 
         val defaultAvatar = "default.jpg"
         val newBoxId = boxRef.push().key!!
-        var newBoxChat = BoxChat(newBoxId, boxName, defaultAvatar, "")
+        var newBoxChat = BoxChat(newBoxId, boxName, defaultAvatar, "Box Chat Created")
 
         boxRef.child(newBoxId).setValue(newBoxChat).addOnSuccessListener {
 
@@ -78,6 +78,11 @@ class BoxChatRepositoryImpl : BoxChatRepository {
             .setValue(newMess)
             .addOnFailureListener {
                 Log.d("sendMess", "False")
+            }
+        boxRef.child(boxId).child("lastMess")
+            .setValue(data)
+            .addOnFailureListener {
+                Log.d("ChatApp", "set lastMess Failure")
             }
     }
 

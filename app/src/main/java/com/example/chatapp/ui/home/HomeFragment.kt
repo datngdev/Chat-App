@@ -1,15 +1,21 @@
 package com.example.chatapp.ui.home
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.chatapp.R
+import com.example.chatapp.databinding.DialogCreateBoxChatBinding
 import com.example.chatapp.databinding.FragmentHomeBinding
 import com.example.chatapp.datas.models.BoxChat
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
@@ -72,15 +78,27 @@ class HomeFragment : Fragment() {
         }
 
         binding.txtBoxAdd.setOnClickListener {
-            val boxId = "Math"
+            //create dialog
+            val builder = AlertDialog.Builder(requireContext())
+            val createBoxView = layoutInflater.inflate(R.layout.dialog_create_box_chat, null)
 
-            lifecycleScope.launch {
-                homeViewModel.processCreateBoxChat(currentUser, boxId).collect {
-                    if (it == true) {
-                        Toast.makeText(context, "Create Box Chat $boxId successfully", Toast.LENGTH_SHORT).show()
+            builder.setTitle("Input Box Chat name")
+            builder.setView(createBoxView)
+            builder.setPositiveButton("Create") { _: DialogInterface?, _: Int ->
+                val boxId = createBoxView.findViewById<EditText>(R.id.alert_dialog_data).text.toString()
+                if (!boxId.isNullOrEmpty()) {
+                    lifecycleScope.launch {
+                        homeViewModel.processCreateBoxChat(currentUser, boxId).collect {
+                            if (it == true) {
+                                Toast.makeText(context, "Create Box Chat $boxId successfully", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             }
+
+            val dialog = builder.create()
+            dialog.show()
         }
 
         lifecycleScope.launch {
@@ -88,7 +106,7 @@ class HomeFragment : Fragment() {
                 if (!it.isNullOrEmpty()) {
                     boxList.clear()
                     boxList.addAll(it)
-                    Log.d("CA", boxList.toString())
+
                     boxChatAdapter.notifyDataSetChanged()
                 }
             }
