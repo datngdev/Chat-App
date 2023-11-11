@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_chat_card_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardCornerRadius="18dp">
+        <ImageView
+            android:id="@+id/item_chat_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:src="@mipmap/demo_avatar" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/item_chat_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Sender Name"
+        android:textSize="18sp"
+        android:textColor="@color/gray_text"
+        android:layout_marginStart="@dimen/_5sdp"
+        app:layout_constraintStart_toStartOf="@+id/item_chat_data"
+        app:layout_constraintBottom_toTopOf="@+id/item_chat_data"/>
+
+    <TextView
+        android:id="@+id/item_chat_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="@dimen/_174sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:paddingTop="@dimen/_9sdp"
+        android:paddingBottom="@dimen/_9sdp"
+        android:paddingStart="@dimen/_15sdp"
+        android:paddingEnd="@dimen/_15sdp"
+        tools:text="Same here. I've been trying to stay busy by working on some art projects."
+        android:textSize="18sp"
+        android:textColor="@color/white_mess_text"
+        android:background="@drawable/shape_mess_background"
+        app:layout_constraintStart_toEndOf="@id/item_chat_card_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

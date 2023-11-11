@@ -1,15 +1,20 @@
 package com.example.chatapp.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.chatapp.databinding.FragmentHomeBinding
-import com.example.chatapp.datas.repositories.UserRepository
+import com.example.chatapp.datas.models.BoxChat
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     companion object {
@@ -22,6 +27,7 @@ class HomeFragment : Fragment() {
 
     interface HomeFragmentCallBack {
         fun navigateToLogin()
+        fun navigateToChatDetail(boxId: String)
     }
 
     private var _binding: FragmentHomeBinding? = null
@@ -45,12 +51,47 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val currentUser = loginSharedPreference.getCurrentUserId()!!
-        binding.txtHome.text = currentUser
 
-        binding.btnLogout.setOnClickListener {
+        var boxList = emptyList<BoxChat>().toMutableList()
+        val layoutManager = LinearLayoutManager(context)
+
+        val adapterCallBack = object: BoxChatAdapter.Callback {
+            override fun onBoxClick(boxId: String) {
+                callBack?.navigateToChatDetail(boxId)
+            }
+
+        }
+        val boxChatAdapter = BoxChatAdapter(boxList, adapterCallBack)
+
+        binding.recyclerviewBoxList.layoutManager = layoutManager
+        binding.recyclerviewBoxList.adapter = boxChatAdapter
+
+        binding.txtHomeMenu.setOnClickListener {
             homeViewModel.logout(currentUser)
-            loginSharedPreference.logout()
-            callBack!!.navigateToLogin()
+            callBack?.navigateToLogin()
+        }
+
+        binding.txtBoxAdd.setOnClickListener {
+            val boxId = "Math"
+
+            lifecycleScope.launch {
+                homeViewModel.processCreateBoxChat(currentUser, boxId).collect {
+                    if (it == true) {
+                        Toast.makeText(context, "Create Box Chat $boxId successfully", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            homeViewModel.processGetBoxChat(currentUser).collect {
+                if (!it.isNullOrEmpty()) {
+                    boxList.clear()
+                    boxList.addAll(it)
+                    Log.d("CA", boxList.toString())
+                    boxChatAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 

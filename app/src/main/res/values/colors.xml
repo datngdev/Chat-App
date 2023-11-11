@@ -3,4 +3,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="purple_primary">#7C01F6</color>
+    <color name="hint_text_search">#C4575459</color>
+    <color name="gray_main_color">#1F1F1F</color>
+    <color name="text_search_color">#FF504F50</color>
+    <color name="item_text_color">#C8C8C8</color>
+    <color name="item_background_color">#444444</color>
+    <color name="item_background_stroke_color">#007D7783</color>
+    <color name="purrple_item_box_chat">#7C01F6</color>
+    <color name="green_active">#00FF85</color>
+    <color name="black_chat_detail">#121111</color>
+    <color name="gray_text">#4D4C4E</color>
+    <color name="gray_input_text">#272626</color>
+    <color name="white_mess_text">#BABABA</color>
 </resources>

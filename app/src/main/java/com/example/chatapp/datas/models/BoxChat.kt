@@ -1,8 +1,8 @@
 package com.example.chatapp.datas.models
 
-data class User(
+data class BoxChat (
+    var id: String,
     var name: String,
     var avatar: String,
-    var isActive: Boolean,
-    var boxIdList: MutableList<String>
+    var lastMess: String?
 )

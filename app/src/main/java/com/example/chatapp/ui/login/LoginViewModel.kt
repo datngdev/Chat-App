@@ -25,7 +25,6 @@ class LoginViewModel : ViewModel() {
             }
         }
         return loginState
-
     }
 
     private suspend fun registerAndLogin(userId: String) {

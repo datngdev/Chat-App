@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_68sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/item_background_radius_22">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/item_image_card_view"
+        android:layout_width="@dimen/_52sdp"
+        android:layout_height="@dimen/_52sdp"
+        android:layout_marginStart="@dimen/_7sdp"
+        app:cardCornerRadius="@dimen/_26sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" >
+        <ImageView
+            android:id="@+id/item_user_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:src="@mipmap/demo_avatar" />
+    </androidx.cardview.widget.CardView>
+    
+    <TextView
+        android:id="@+id/item_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_17sdp"
+        android:layout_marginStart="@dimen/_7sdp"
+        tools:text="Alexander"
+        android:textSize="17sp"
+        android:textColor="@color/item_text_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/item_image_card_view" />
+    
+    <TextView
+        android:id="@+id/item_mess"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_14sdp"
+        android:layout_marginTop="@dimen/_7sdp"
+        android:layout_marginStart="@dimen/_7sdp"
+        tools:text="Hey, What's up?"
+        android:textColor="@color/item_text_color"
+        app:layout_constraintTop_toBottomOf="@id/item_user_name"
+        app:layout_constraintStart_toEndOf="@id/item_image_card_view" />
+
+    <TextView
+        android:id="@+id/item_time_last_mess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_17sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        tools:text="4 min"
+        android:textColor="@color/purrple_item_box_chat"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/item_mess_unseen_count"
+        android:layout_width="@dimen/_14sdp"
+        android:layout_height="@dimen/_14sdp"
+        android:layout_marginTop="@dimen/_38sdp"
+        android:layout_marginEnd="@dimen/_15sdp"
+        tools:text="1"
+        android:textSize="9sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:background="@drawable/shape_unseen_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
