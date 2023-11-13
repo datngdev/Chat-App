@@ -17,7 +17,7 @@ class UserRepositoryImpl : UserRepository {
     private val userRef = db.getReference("users")
     private val boxRef = db.getReference("boxChats")
     override fun isExistUser(userId: String): StateFlow<Boolean?> {
-        val isExistUserState = MutableStateFlow(false)
+        val isExistUserState = MutableStateFlow<Boolean?>(null)
 
         db.reference.child("users").addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
