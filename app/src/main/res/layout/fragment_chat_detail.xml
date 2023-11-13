@@ -14,12 +14,25 @@
         android:background="@color/gray_main_color"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/chat_btn_back"
+        android:clickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:background="@drawable/baseline_arrow_back_ios_24"
+        android:backgroundTint="@color/white"
+        app:layout_constraintTop_toTopOf="@id/chat_top_background"
+        app:layout_constraintBottom_toBottomOf="@id/chat_top_background"
+        app:layout_constraintStart_toStartOf="@id/chat_top_background" />
+
     
     <androidx.cardview.widget.CardView
         android:id="@+id/chat_card_view"
         android:layout_width="@dimen/_52sdp"
         android:layout_height="@dimen/_52sdp"
-        android:layout_marginStart="@dimen/_25sdp"
+        android:layout_marginStart="@dimen/_35sdp"
         app:cardCornerRadius="@dimen/_26sdp"
         app:layout_constraintTop_toTopOf="@id/chat_top_background"
         app:layout_constraintStart_toStartOf="@id/chat_top_background"

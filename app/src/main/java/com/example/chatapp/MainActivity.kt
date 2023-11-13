@@ -6,6 +6,7 @@ import com.example.chatapp.databinding.ActivityMainBinding
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
 import com.example.chatapp.ui.chatDetail.ChatDetailFragment
+import com.example.chatapp.ui.editProfile.EditProfileFragment
 import com.example.chatapp.ui.home.HomeFragment
 import com.example.chatapp.ui.login.LoginFragment
 
@@ -61,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.main_frame_layout, chatDetailFragment).commit()
+    }
+
+    private fun goToEditProfile() {
+        val editProfile = EditProfileFragment.newInstance()
     }
 
     private fun isLogin(): Boolean {

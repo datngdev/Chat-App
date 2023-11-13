@@ -55,6 +55,10 @@ class ChatDetailFragment : Fragment() {
 
         val currentUser = sharedPreference.getCurrentUserId()!!
 
+        binding.chatBtnBack.setOnClickListener {
+            callback!!.navigateToHome()
+        }
+
         binding.chatBtnSend.setOnClickListener {
             val newMess = binding.chatData.text.toString()
             if (!newMess.isNullOrEmpty()) {

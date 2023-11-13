@@ -110,5 +110,24 @@ class BoxChatRepositoryImpl : BoxChatRepository {
         return messList
     }
 
+    fun getBoxDetail(boxId: String): MutableStateFlow<List<String>> {
+        val boxDetail = MutableStateFlow(emptyList<String>())
+
+        boxRef.child(boxId).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var boxDetail = mutableListOf<String>()
+
+                val name = snapshot.child("name").value.toString()
+
+                boxDetail.add(name)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("ChatApp", "Get Box Detail Cancelled")
+            }
+
+        })
+        return boxDetail
+    }
 
 }
