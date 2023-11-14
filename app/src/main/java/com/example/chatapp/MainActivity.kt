@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
             override fun navigateToChatDetail(boxId: String) {
                 goToChatDetail(boxId)
             }
+
+            override fun navigateToEditProfile() {
+                goToEditProfile()
+            }
         })
 
         val ft = supportFragmentManager.beginTransaction()
@@ -65,7 +69,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToEditProfile() {
-        val editProfile = EditProfileFragment.newInstance()
+        val editProfileFragment = EditProfileFragment.newInstance(object : EditProfileFragment.EditProfileCallBack {
+            override fun navigateToHome() {
+                goToHomeScreen()
+            }
+
+            override fun navigateToLogin() {
+                goToLoginScreen()
+            }
+        })
+
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.main_frame_layout, editProfileFragment).commit()
     }
 
     private fun isLogin(): Boolean {

@@ -12,7 +12,8 @@ import com.example.chatapp.datas.models.Message
 import org.w3c.dom.Text
 
 class MessagesAdapter(
-    private val dataset: List<Message>
+    private val dataset: List<Message>,
+    private val callBack: MessagesAdapterCallBack
 )  : RecyclerView.Adapter<MessagesAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name = view.findViewById<TextView>(R.id.item_chat_name)
@@ -34,5 +35,10 @@ class MessagesAdapter(
 
         holder.name.text = item.sender
         holder.data.text = item.data
+        callBack.loadUserImage(item.sender, holder.avatar)
+    }
+
+    interface MessagesAdapterCallBack {
+        fun loadUserImage(userId: String, img: ImageView)
     }
 }

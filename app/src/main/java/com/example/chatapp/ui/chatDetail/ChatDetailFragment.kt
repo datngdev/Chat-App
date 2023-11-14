@@ -1,14 +1,16 @@
 package com.example.chatapp.ui.chatDetail
 
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.chatapp.databinding.FragmentChatDetailBinding
 import com.example.chatapp.datas.models.Message
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
@@ -67,18 +69,45 @@ class ChatDetailFragment : Fragment() {
             }
         }
 
-        val layoutmanager = LinearLayoutManager(context)
-        var messList = mutableListOf<Message>()
-        val adapter = MessagesAdapter(messList)
+        lifecycleScope.launch {
+            chatDetailViewModel.getBox(boxId).collect {boxData ->
+                if (!boxData.isNullOrEmpty()) {
+                    val boxName = boxData[0]
+                    val avatarUrl = boxData[1]
 
-        binding.chatRecyclerView.layoutManager = layoutmanager
+                    binding.chatName.text = boxName
+                    Glide.with(requireContext())
+                        .load(avatarUrl)
+                        .centerCrop()
+                        .into(binding.chatImageItem)
+                }
+            }
+        }
+
+        val layoutManager = LinearLayoutManager(context)
+        layoutManager.reverseLayout = true
+        var messList = mutableListOf<Message>()
+        val adapter = MessagesAdapter(messList, object : MessagesAdapter.MessagesAdapterCallBack {
+            override fun loadUserImage(userId: String, img: ImageView) {
+                lifecycleScope.launch {
+                    chatDetailViewModel.loadUserImage(userId).collect {avatarUrl ->
+                        Log.d("avatarUrl", avatarUrl)
+                        Glide.with(requireContext())
+                            .load(avatarUrl)
+                            .centerCrop()
+                            .into(img)
+                    }
+                }
+            }
+        })
+
+        binding.chatRecyclerView.layoutManager = layoutManager
         binding.chatRecyclerView.adapter = adapter
 
         lifecycleScope.launch {
             chatDetailViewModel.getMess(currentUser, boxId).collect {
                 messList.clear()
-                messList.addAll(it)
-
+                messList.addAll(it.reversed())
                 adapter.notifyDataSetChanged()
             }
         }

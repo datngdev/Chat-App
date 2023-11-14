@@ -8,12 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.databinding.DialogCreateBoxChatBinding
 import com.example.chatapp.databinding.FragmentHomeBinding
@@ -34,6 +36,7 @@ class HomeFragment : Fragment() {
     interface HomeFragmentCallBack {
         fun navigateToLogin()
         fun navigateToChatDetail(boxId: String)
+        fun navigateToEditProfile()
     }
 
     private var _binding: FragmentHomeBinding? = null
@@ -58,7 +61,7 @@ class HomeFragment : Fragment() {
 
         val currentUser = loginSharedPreference.getCurrentUserId()!!
 
-        var boxList = emptyList<BoxChat>().toMutableList()
+        var boxList = mutableListOf<BoxChat>()
         val layoutManager = LinearLayoutManager(context)
 
         val adapterCallBack = object: BoxChatAdapter.Callback {
@@ -66,6 +69,12 @@ class HomeFragment : Fragment() {
                 callBack?.navigateToChatDetail(boxId)
             }
 
+            override fun loadBoxAvatar(img: ImageView, url: String) {
+                Glide.with(requireContext())
+                    .load(url)
+                    .centerCrop()
+                    .into(img)
+            }
         }
         val boxChatAdapter = BoxChatAdapter(boxList, adapterCallBack)
 
@@ -73,8 +82,11 @@ class HomeFragment : Fragment() {
         binding.recyclerviewBoxList.adapter = boxChatAdapter
 
         binding.txtHomeMenu.setOnClickListener {
-            homeViewModel.logout(currentUser)
-            callBack?.navigateToLogin()
+            callBack!!.navigateToEditProfile()
+        }
+
+        binding.btnSearch.setOnClickListener {
+            Toast.makeText(context, "Do Nothing", Toast.LENGTH_SHORT).show()
         }
 
         binding.txtBoxAdd.setOnClickListener {

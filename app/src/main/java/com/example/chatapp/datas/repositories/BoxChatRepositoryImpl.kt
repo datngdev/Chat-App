@@ -9,36 +9,46 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 class BoxChatRepositoryImpl : BoxChatRepository {
     private val db = Firebase.database
+    private val storage = Firebase.storage
+
+    private val avatarRef = storage.getReference("UserAvatar")
     private val boxRef = db.getReference("boxChats")
     private val userRef = db.getReference("users")
 
+
     override fun createBoxChat(userId: String, boxName: String): StateFlow<Boolean?> {
         val createBoxStatus = MutableStateFlow<Boolean?>(null)
+        avatarRef.child("default.jpg").downloadUrl.addOnSuccessListener {
+            val defaultAvatar = it.toString()
+            val newBoxId = boxRef.push().key!!
+            var newBoxChat = BoxChat(newBoxId, boxName, defaultAvatar, "Box Chat Created")
 
-        val defaultAvatar = "default.jpg"
-        val newBoxId = boxRef.push().key!!
-        var newBoxChat = BoxChat(newBoxId, boxName, defaultAvatar, "Box Chat Created")
+            boxRef.child(newBoxId).setValue(newBoxChat).addOnSuccessListener {
 
-        boxRef.child(newBoxId).setValue(newBoxChat).addOnSuccessListener {
-
-            userRef.child(userId).child("boxIdList").child(newBoxId).setValue(true).addOnSuccessListener {
-                createBoxStatus.value = true
+                userRef.child(userId).child("boxIdList").child(newBoxId).setValue(true).addOnSuccessListener {
+                    createBoxStatus.value = true
+                }.addOnFailureListener {
+                    createBoxStatus.value = false
+                }
             }.addOnFailureListener {
                 createBoxStatus.value = false
             }
         }.addOnFailureListener {
             createBoxStatus.value = false
+        }.addOnCanceledListener {
+            createBoxStatus.value = false
         }
         return createBoxStatus
     }
 
-    override fun getBox(boxId: List<String>): MutableStateFlow<List<BoxChat>> {
+    override fun getBoxList(boxId: List<String>): MutableStateFlow<List<BoxChat>> {
         val boxList = MutableStateFlow(emptyList<BoxChat>())
         boxRef.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -70,6 +80,26 @@ class BoxChatRepositoryImpl : BoxChatRepository {
         return boxList
     }
 
+    override fun getBoxInfo(boxId: String): MutableStateFlow<List<String>> {
+        val boxInfo = MutableStateFlow(emptyList<String>())
+
+        boxRef.child(boxId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userName = snapshot.child("name").value.toString()
+                val avatarUrl = snapshot.child("avatar").value.toString()
+
+                val newList = listOf(userName, avatarUrl)
+
+                boxInfo.update { newList }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("ChatApp", "getBoxInfo Cancelled")
+            }
+        })
+        return boxInfo
+    }
+
     override fun sendMess(userId: String, boxId: String, data: String) {
         val newMess = Message(userId, data)
 
@@ -99,7 +129,6 @@ class BoxChatRepositoryImpl : BoxChatRepository {
                     newList.add(newMess)
                 }
                 messList.update { newList }
-                Log.d("messList repo", messList.value.toString())
             }
 
             override fun onCancelled(error: DatabaseError) {

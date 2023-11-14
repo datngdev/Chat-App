@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface BoxChatRepository {
     fun createBoxChat(userId: String, boxId: String): StateFlow<Boolean?>
-    fun getBox(userId: List<String>): MutableStateFlow<List<BoxChat>>
+    fun getBoxList(userId: List<String>): MutableStateFlow<List<BoxChat>>
+    fun getBoxInfo(boxId: String): MutableStateFlow<List<String>>
     fun sendMess(userId: String, boxId: String, data: String)
     fun getMess(userId: String, boxId: String): MutableStateFlow<List<Message>>
 }

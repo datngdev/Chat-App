@@ -1,6 +1,5 @@
 package com.example.chatapp.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.datas.models.BoxChat
@@ -10,7 +9,6 @@ import com.example.chatapp.datas.repositories.UserRepository
 import com.example.chatapp.datas.repositories.UserRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -44,10 +42,10 @@ class HomeViewModel : ViewModel() {
         val boxList = MutableStateFlow(emptyList<BoxChat>())
 
         viewModelScope.launch {
-            userRepo.getBoxId(userId).collect { boxId ->
+            userRepo.getUserBoxId(userId).collect { boxId ->
                 if (!boxId.isNullOrEmpty()) {
                     viewModelScope.launch {
-                        boxRepo.getBox(boxId).collect {newBoxList ->
+                        boxRepo.getBoxList(boxId).collect { newBoxList ->
                             boxList.update { newBoxList }
                         }
                     }
@@ -57,4 +55,5 @@ class HomeViewModel : ViewModel() {
 
         return boxList
     }
+
 }

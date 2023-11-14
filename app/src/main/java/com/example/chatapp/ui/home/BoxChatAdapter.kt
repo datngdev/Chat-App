@@ -34,7 +34,7 @@ class BoxChatAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = dataset[position]
 
-        //holder.image.resources =
+        callBack.loadBoxAvatar(holder.image, item.avatar)
         holder.name.text = item.name
         holder.mess.text = item.lastMess
 
@@ -45,5 +45,6 @@ class BoxChatAdapter(
 
     interface Callback{
         fun onBoxClick(boxId: String)
+        fun loadBoxAvatar(img: ImageView, url: String)
     }
 }
