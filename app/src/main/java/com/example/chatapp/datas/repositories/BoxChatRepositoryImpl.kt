@@ -1,8 +1,10 @@
 package com.example.chatapp.datas.repositories
 
+import android.net.Uri
 import android.util.Log
 import com.example.chatapp.datas.models.BoxChat
 import com.example.chatapp.datas.models.Message
+import com.example.chatapp.datas.models.User
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,6 +21,8 @@ class BoxChatRepositoryImpl : BoxChatRepository {
     private val storage = Firebase.storage
 
     private val avatarRef = storage.getReference("UserAvatar")
+    private val boxAvatar = storage.getReference("BoxAvatar")
+
     private val boxRef = db.getReference("boxChats")
     private val userRef = db.getReference("users")
 
@@ -139,24 +143,53 @@ class BoxChatRepositoryImpl : BoxChatRepository {
         return messList
     }
 
-    fun getBoxDetail(boxId: String): MutableStateFlow<List<String>> {
-        val boxDetail = MutableStateFlow(emptyList<String>())
-
-        boxRef.child(boxId).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var boxDetail = mutableListOf<String>()
-
-                val name = snapshot.child("name").value.toString()
-
-                boxDetail.add(name)
+    override fun setImage(boxId: String, image: Uri): MutableStateFlow<Boolean?> {
+        val uploadState = MutableStateFlow<Boolean?>(null)
+        val boxAvatar = boxAvatar.child("$boxId.jpg")
+        boxAvatar.putFile(image).addOnSuccessListener {
+            it.storage.downloadUrl.addOnSuccessListener { uri ->
+                setBoxAvatarUrl(boxId, uri)
+                uploadState.value = true
             }
+        }.addOnFailureListener {
+            uploadState.value = false
+        }.addOnCanceledListener {
+            uploadState.value = false
+        }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("ChatApp", "Get Box Detail Cancelled")
-            }
-
-        })
-        return boxDetail
+        return uploadState
     }
 
+    override fun setBoxAvatarUrl(boxId: String, image: Uri) {
+        boxRef.child(boxId).child("avatar").setValue(image.toString())
+    }
+
+    override fun setName(boxId: String, name: String): MutableStateFlow<Boolean?> {
+        val updateState = MutableStateFlow<Boolean?>(null)
+
+        boxRef.child(boxId).child("name").setValue(name).addOnSuccessListener {
+            updateState.value = true
+        }.addOnFailureListener {
+            updateState.value = false
+        }.addOnCanceledListener {
+            updateState.value = false
+        }
+        return updateState
+    }
+
+    override fun getUsetList(boxId: String): MutableStateFlow<List<User>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addUser(boxId: String, userId: String): MutableStateFlow<Boolean?> {
+        val addState = MutableStateFlow<Boolean?>(null)
+        userRef.child(userId).child("boxIdList").child(boxId).setValue(true).addOnCanceledListener {
+            addState.value = true
+        }.addOnFailureListener {
+            addState.value = false
+        }.addOnCanceledListener {
+            addState.value = false
+        }
+        return addState
+    }
 }

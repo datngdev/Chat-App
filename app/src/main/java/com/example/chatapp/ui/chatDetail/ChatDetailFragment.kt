@@ -30,6 +30,7 @@ class ChatDetailFragment : Fragment() {
 
     interface ChatDetailCallBack {
         fun navigateToHome()
+        fun navigateToEditBoxChat(boxId: String)
     }
 
     private var _binding: FragmentChatDetailBinding? = null
@@ -56,6 +57,10 @@ class ChatDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val currentUser = sharedPreference.getCurrentUserId()!!
+
+        binding.chatTopBackground.setOnClickListener {
+            callback!!.navigateToEditBoxChat(boxId)
+        }
 
         binding.chatBtnBack.setOnClickListener {
             callback!!.navigateToHome()
@@ -87,7 +92,7 @@ class ChatDetailFragment : Fragment() {
         val layoutManager = LinearLayoutManager(context)
         layoutManager.reverseLayout = true
         var messList = mutableListOf<Message>()
-        val adapter = MessagesAdapter(messList, object : MessagesAdapter.MessagesAdapterCallBack {
+        val adapter = MessagesAdapter(currentUser, messList, object : MessagesAdapter.MessagesAdapterCallBack {
             override fun loadUserImage(userId: String, img: ImageView) {
                 lifecycleScope.launch {
                     chatDetailViewModel.loadUserImage(userId).collect {avatarUrl ->

@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/_86sdp"
         android:background="@color/gray_main_color"
+        android:clickable="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -6,6 +6,7 @@ import com.example.chatapp.databinding.ActivityMainBinding
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
 import com.example.chatapp.ui.chatDetail.ChatDetailFragment
+import com.example.chatapp.ui.editBoxChat.EditBoxChatFragment
 import com.example.chatapp.ui.editProfile.EditProfileFragment
 import com.example.chatapp.ui.home.HomeFragment
 import com.example.chatapp.ui.login.LoginFragment
@@ -62,6 +63,10 @@ class MainActivity : AppCompatActivity() {
             override fun navigateToHome() {
                 goToHomeScreen()
             }
+
+            override fun navigateToEditBoxChat(boxId: String) {
+                goToEditBoxChat(boxId)
+            }
         }, boxId)
 
         val ft = supportFragmentManager.beginTransaction()
@@ -81,6 +86,17 @@ class MainActivity : AppCompatActivity() {
 
         val ft = supportFragmentManager.beginTransaction()
         ft.replace(R.id.main_frame_layout, editProfileFragment).commit()
+    }
+
+    private fun goToEditBoxChat(boxId: String) {
+        val editBoxChatFragment = EditBoxChatFragment.newInstance(boxId, object: EditBoxChatFragment.EditBoxChatCallBack {
+            override fun navigateToBoxDetail() {
+                goToChatDetail(boxId)
+            }
+        })
+
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.main_frame_layout, editBoxChatFragment).commit()
     }
 
     private fun isLogin(): Boolean {
