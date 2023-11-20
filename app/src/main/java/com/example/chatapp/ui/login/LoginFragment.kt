@@ -1,8 +1,6 @@
 package com.example.chatapp.ui.login
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.chatapp.databinding.FragmentLoginBinding
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
@@ -52,7 +49,6 @@ class LoginFragment : Fragment() {
 
         binding.btnLogin.setOnClickListener {
             val userId = binding.editTextUsername.text.toString()
-            Log.d("ChatApp", "UserId: $userId")
 
             lifecycleScope.launch {
                 loginViewModel.processLogin(userId).collect {

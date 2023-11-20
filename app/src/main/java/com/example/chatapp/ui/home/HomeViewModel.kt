@@ -3,34 +3,52 @@ package com.example.chatapp.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.datas.models.BoxChat
-import com.example.chatapp.datas.repositories.BoxChatRepository
-import com.example.chatapp.datas.repositories.BoxChatRepositoryImpl
+import com.example.chatapp.datas.repositories.BoxRepository
+import com.example.chatapp.datas.repositories.BoxRepositoryImpl
 import com.example.chatapp.datas.repositories.UserRepository
 import com.example.chatapp.datas.repositories.UserRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
-    private val boxChatRepo: BoxChatRepository = BoxChatRepositoryImpl()
-
     private val userRepo: UserRepository = UserRepositoryImpl()
-    private val boxRepo: BoxChatRepository = BoxChatRepositoryImpl()
+    private val boxRepo: BoxRepository = BoxRepositoryImpl()
 
-    fun logout(userId: String) {
-        userRepo.logout(userId)
-    }
-
-    fun processCreateBoxChat(userId: String, boxId: String): StateFlow<Boolean?> {
+    fun processCreateBoxChat(userId: String, boxName: String): StateFlow<Boolean?> {
         val createBoxStatus = MutableStateFlow<Boolean?>(null)
-
+        val defaultAvatar = "default"
         viewModelScope.launch {
-            boxChatRepo.createBoxChat(userId, boxId).collect {
-                if (it == true) {
-                    createBoxStatus.value = true
-                } else if (it == false) {
-                    createBoxStatus.value = false
+            boxRepo.getBoxAvatarDownloadUrl(defaultAvatar).collect {avatarUrl ->
+                if (avatarUrl != null) {
+                    if (avatarUrl.isNotEmpty()) {
+                        boxRepo.createBoxChat(boxName, avatarUrl).collect {boxId ->
+                            if (boxId != null) {
+                                if (boxId.isNotEmpty()) {
+                                    userRepo.addToBox(userId, boxId).collect { addState ->
+                                        if (addState == true) {
+                                            boxRepo.setAdmin(userId, boxId).collect {setAdminState ->
+                                                if (setAdminState == true) {
+                                                    createBoxStatus.value = true
+                                                } else if (setAdminState == false) {
+                                                    createBoxStatus.value = false
+                                                }
+                                            }
+                                        } else if (addState == false) {
+                                            createBoxStatus.value = false
+                                        }
+                                    }
+                                } else {
+                                    createBoxStatus.value = false
+                                }
+                            }
+                        }
+                    } else {
+                        createBoxStatus.value = false
+                    }
                 }
             }
         }
@@ -42,10 +60,15 @@ class HomeViewModel : ViewModel() {
         val boxList = MutableStateFlow(emptyList<BoxChat>())
 
         viewModelScope.launch {
-            userRepo.getUserBoxId(userId).collect { boxId ->
-                if (!boxId.isNullOrEmpty()) {
+            userRepo.getBoxIdList(userId).collect { boxIdList ->
+                if (!boxIdList.isNullOrEmpty()) {
                     viewModelScope.launch {
-                        boxRepo.getBoxList(boxId).collect { newBoxList ->
+                        boxRepo.getBoxByIdList(boxIdList).collect { newBoxList ->
+                            newBoxList.forEach { boxChat ->
+                                if (boxChat.lastMess!!.length > 28) {
+                                    boxChat.lastMess = processLongMess(boxChat.lastMess)
+                                }
+                            }
                             boxList.update { newBoxList }
                         }
                     }
@@ -56,4 +79,19 @@ class HomeViewModel : ViewModel() {
         return boxList
     }
 
+    fun getUnseenCountList(userId: String): MutableStateFlow<List<Map<String, String>>> {
+        val resultList = MutableStateFlow(emptyList<Map<String, String>>())
+        viewModelScope.launch {
+            userRepo.getUserUnseenCountList(userId).collect {unseenList ->
+                if (!unseenList.isNullOrEmpty()) {
+                    resultList.update { unseenList }
+                }
+            }
+        }
+        return resultList
+    }
+
+    private fun processLongMess(mess: String): String {
+        return mess.take(25).plus("...")
+    }
 }

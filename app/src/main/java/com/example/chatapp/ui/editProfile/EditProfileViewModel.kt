@@ -1,6 +1,7 @@
 package com.example.chatapp.ui.editProfile
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chatapp.datas.repositories.UserRepository
@@ -21,7 +22,7 @@ class EditProfileViewModel : ViewModel() {
         val updateState = MutableStateFlow<Boolean?>(null)
 
         viewModelScope.launch {
-            userRepo.updateUserProfile(userId, userName).collect {
+            userRepo.setUserName(userId, userName).collect {
                 if (it == true) {
                     updateState.value = true
                 }
@@ -35,29 +36,54 @@ class EditProfileViewModel : ViewModel() {
     }
 
     fun getUser(userId: String): MutableStateFlow<List<String>> {
-        val userInfo = MutableStateFlow(emptyList<String>())
+        val resultUserData = MutableStateFlow(emptyList<String>())
+
 
         viewModelScope.launch {
-            userRepo.getUser(userId).collect() {userData ->
-                if (!userData.isNullOrEmpty()) {
-                    userInfo.update { userData }
+            var userData = mutableListOf("","")
+            viewModelScope.launch {
+                userRepo.getUserName(userId).collect { userName ->
+                    if (!userName.isNullOrEmpty()) {
+                        userData[0] = userName
+                        resultUserData.update { userData.toList() }
+                    }
+                }
+            }
+            userRepo.getUserAvatarUrl(userId).collect {avatarUrl ->
+                if (!avatarUrl.isNullOrEmpty()) {
+                    userData[1] = avatarUrl
+                    resultUserData.update { userData.toList() }
                 }
             }
         }
-        return userInfo
+
+
+
+        return resultUserData
     }
 
     fun updateUserAvatar(userId: String, image: Uri): MutableStateFlow<Boolean?> {
-        val uploadState = MutableStateFlow<Boolean?>(null)
+        val updateState = MutableStateFlow<Boolean?>(null)
         viewModelScope.launch {
-            userRepo.uploadImage(userId, image).collect {state ->
-                if (state == true) {
-                    uploadState.value = true
-                } else if (state == false) {
-                    uploadState.value = false
+            userRepo.uploadUserAvatar(userId, image).collect {uploadState ->
+                if (uploadState == true) {
+                    userRepo.getUserAvatarDownloadUrl(userId).collect {avatarUrl ->
+                        if(!avatarUrl.isNullOrEmpty()) {
+                            userRepo.setUserAvatarUrl(userId, avatarUrl).collect {setAvatarState ->
+                                if (setAvatarState == true) {
+                                    updateState.value = true
+                                }
+                                else if (setAvatarState == false) {
+                                    updateState.value = false
+                                }
+                            }
+                        }
+                    }
+                } else if (uploadState == false) {
+                    updateState.value = false
                 }
             }
         }
-        return  uploadState
+        return  updateState
     }
 }

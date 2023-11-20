@@ -1,8 +1,9 @@
 package com.example.chatapp.datas.models
 
 data class BoxChat (
-    var id: String,
-    var name: String,
-    var avatar: String,
-    var lastMess: String?
+    val id: String,
+    val name: String,
+    val avatar: String,
+    var lastMess: String,
+    var lastSendTime: String
 )

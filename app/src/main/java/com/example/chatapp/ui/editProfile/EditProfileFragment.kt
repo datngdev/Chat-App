@@ -1,7 +1,6 @@
 package com.example.chatapp.ui.editProfile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +9,11 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.chatapp.databinding.EditProfileFragmentBinding
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class EditProfileFragment : Fragment() {
@@ -53,12 +50,12 @@ class EditProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = loginSharedPreference.getCurrentUserId()!!
+        val currentUserId = loginSharedPreference.getCurrentUserId()!!
 
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 lifecycleScope.launch {
-                    editProfileViewModel.updateUserAvatar(userId, uri).collect {state ->
+                    editProfileViewModel.updateUserAvatar(currentUserId, uri).collect { state ->
                         if (state == true) {
                             binding.editProfileImg.setImageURI(uri)
                             Toast.makeText(context, "Avatar Changed", Toast.LENGTH_SHORT).show()
@@ -76,8 +73,10 @@ class EditProfileFragment : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
+        binding.editProfileUid.text = currentUserId
+
         binding.editProfileLogout.setOnClickListener {
-            editProfileViewModel.logout(userId)
+            editProfileViewModel.logout(currentUserId)
             loginSharedPreference.logout()
             callback!!.navigateToLogin()
         }
@@ -85,7 +84,7 @@ class EditProfileFragment : Fragment() {
         binding.editProfileBtn.setOnClickListener {
             val newUserName = binding.editProfileName.text.toString()
             lifecycleScope.launch {
-                editProfileViewModel.updateUserName(userId, newUserName).collect {
+                editProfileViewModel.updateUserName(currentUserId, newUserName).collect {
                     if (it == true) {
                         Toast.makeText(context, "Update User Profile Successful", Toast.LENGTH_SHORT).show()
                     } else if (it == false) {
@@ -100,7 +99,7 @@ class EditProfileFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            editProfileViewModel.getUser(userId).collect {userData ->
+            editProfileViewModel.getUser(currentUserId).collect { userData ->
                 if (!userData.isNullOrEmpty()) {
                     val userName = userData[0]
                     val avatarUrl = userData[1]

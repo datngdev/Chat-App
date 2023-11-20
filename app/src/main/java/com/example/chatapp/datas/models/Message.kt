@@ -1,6 +1,10 @@
 package com.example.chatapp.datas.models
 
+import java.sql.Timestamp
+
 data class Message (
-    var sender: String,
-    var data: String
+    val sender: String,
+    val data: String,
+    val type: Int,
+    val sendTime: String?
 )

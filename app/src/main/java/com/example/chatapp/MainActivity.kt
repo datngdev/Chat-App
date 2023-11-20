@@ -6,7 +6,7 @@ import com.example.chatapp.databinding.ActivityMainBinding
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
 import com.example.chatapp.ui.chatDetail.ChatDetailFragment
-import com.example.chatapp.ui.editBoxChat.EditBoxChatFragment
+import com.example.chatapp.ui.editBox.EditBoxChatFragment
 import com.example.chatapp.ui.editProfile.EditProfileFragment
 import com.example.chatapp.ui.home.HomeFragment
 import com.example.chatapp.ui.login.LoginFragment
@@ -92,6 +92,10 @@ class MainActivity : AppCompatActivity() {
         val editBoxChatFragment = EditBoxChatFragment.newInstance(boxId, object: EditBoxChatFragment.EditBoxChatCallBack {
             override fun navigateToBoxDetail() {
                 goToChatDetail(boxId)
+            }
+
+            override fun navigateToHome() {
+                goToHomeScreen()
             }
         })
 

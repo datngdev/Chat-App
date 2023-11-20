@@ -1,8 +1,9 @@
 package com.example.chatapp.datas.models
 
 data class User(
-    var name: String,
-    var avatar: String,
-    var isActive: Boolean,
-    var boxIdList: MutableList<String>
+    val id: String,
+    val name: String,
+    val avatar: String,
+    val isActive: Boolean,
+    val boxIdList: MutableList<String>
 )

@@ -51,12 +51,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_17sdp"
         android:layout_marginEnd="@dimen/_15sdp"
-        tools:text="4 min"
-        android:textColor="@color/purrple_item_box_chat"
-        android:textSize="14sp"
-        android:textStyle="bold"
+        android:textColor="@color/purple_item_box_chat"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        tools:text="4 min" />
 
     <TextView
         android:id="@+id/item_mess_unseen_count"

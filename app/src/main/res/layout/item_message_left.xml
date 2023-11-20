@@ -1,77 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/item_chat_card_view"
-        android:layout_width="@dimen/_56sdp"
-        android:layout_height="@dimen/_56sdp"
-        android:layout_marginStart="@dimen/_5sdp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:cardCornerRadius="18dp"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintEnd_toStartOf="@id/item_chat_data">
-        <ImageView
-            android:id="@+id/item_chat_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:src="@mipmap/demo_avatar" />
-
-    </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/item_chat_name"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_message_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Sender Name"
-        android:textSize="18sp"
-        android:textColor="@color/gray_text"
-        android:layout_marginStart="@dimen/_5sdp"
-        app:layout_constraintStart_toStartOf="@+id/item_chat_data"
-        app:layout_constraintBottom_toTopOf="@+id/item_chat_data" />
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/item_message_avatar_cv"
+            android:layout_width="@dimen/_56sdp"
+            android:layout_height="@dimen/_56sdp"
+            android:layout_marginStart="@dimen/_5sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:cardCornerRadius="18dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintEnd_toStartOf="@id/item_chat_data">
+            <ImageView
+                android:id="@+id/item_message_avatar_imv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:src="@mipmap/demo_avatar" />
 
-    <TextView
-        android:id="@+id/item_chat_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxWidth="@dimen/_174sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:paddingTop="@dimen/_9sdp"
-        android:paddingBottom="@dimen/_9sdp"
-        android:paddingStart="@dimen/_15sdp"
-        android:paddingEnd="@dimen/_15sdp"
-        tools:text="Same here. I've been trying to stay busy by working on some art projects."
-        android:textSize="18sp"
-        android:textColor="@color/white_mess_text"
-        android:background="@drawable/shape_mess_background"
-        app:layout_constraintStart_toEndOf="@id/item_chat_card_view"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_chat_card_view_right"/>
+        </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/item_chat_card_view_right"
-        android:layout_width="@dimen/_56sdp"
-        android:layout_height="@dimen/_56sdp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:cardCornerRadius="18dp"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/item_chat_data"
-        app:layout_constraintEnd_toEndOf="parent">
-        <ImageView
-            android:id="@+id/item_chat_avatar_right"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:src="@mipmap/demo_avatar" />
+        <TextView
+            android:id="@+id/item_message_senderName_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Sender Name"
+            android:textSize="18sp"
+            android:textColor="@color/gray_text"
+            android:layout_marginStart="@dimen/_5sdp"
+            app:layout_constraintStart_toStartOf="@+id/item_chat_data"
+            app:layout_constraintBottom_toTopOf="@+id/item_chat_data" />
 
-    </androidx.cardview.widget.CardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/item_chat_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="@dimen/_174sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toEndOf="@id/item_message_avatar_cv"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" >
+            <TextView
+                android:id="@+id/item_chat_data_mess"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/_174sdp"
+                android:visibility="gone"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:paddingTop="@dimen/_9sdp"
+                android:paddingBottom="@dimen/_9sdp"
+                android:paddingStart="@dimen/_15sdp"
+                android:paddingEnd="@dimen/_15sdp"
+                tools:text="Same here. I've been trying to stay busy by working on some art projects."
+                android:textSize="18sp"
+                android:textColor="@color/white_mess_text"
+                android:background="@drawable/shape_mess_background"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+            <ImageView
+                android:id="@+id/item_chat_data_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/_180sdp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                tools:src="@mipmap/demo_avatar"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,15 +20,20 @@ class LoginViewModel : ViewModel() {
                 if(it == true) {
                     login(userId)
                 } else if (it == false) {
-                    registerAndLogin(userId)
+                    val defaultAvatar = "default"
+                    userRepo.getUserAvatarDownloadUrl(defaultAvatar).collect {avatarUrl ->
+                        if (!avatarUrl.isNullOrEmpty()) {
+                            registerAndLogin(userId, avatarUrl)
+                        }
+                    }
                 }
             }
         }
         return loginState
     }
 
-    private suspend fun registerAndLogin(userId: String) {
-        userRepo.registerUser(userId).collect() {
+    private suspend fun registerAndLogin(userId: String, avatarUrl: String) {
+        userRepo.registerUser(userId, avatarUrl).collect {
             if(it == true) {
                 login(userId)
             } else if (it == false) {

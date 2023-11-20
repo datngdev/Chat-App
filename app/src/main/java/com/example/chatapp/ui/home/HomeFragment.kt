@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,11 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.chatapp.R
-import com.example.chatapp.databinding.DialogCreateBoxChatBinding
 import com.example.chatapp.databinding.FragmentHomeBinding
 import com.example.chatapp.datas.models.BoxChat
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
@@ -62,6 +61,7 @@ class HomeFragment : Fragment() {
         val currentUser = loginSharedPreference.getCurrentUserId()!!
 
         var boxList = mutableListOf<BoxChat>()
+        var unseenList = mutableListOf<Map<String, String>>()
         val layoutManager = LinearLayoutManager(context)
 
         val adapterCallBack = object: BoxChatAdapter.Callback {
@@ -76,7 +76,7 @@ class HomeFragment : Fragment() {
                     .into(img)
             }
         }
-        val boxChatAdapter = BoxChatAdapter(boxList, adapterCallBack)
+        val boxChatAdapter = BoxChatAdapter(boxList, unseenList, adapterCallBack)
 
         binding.recyclerviewBoxList.layoutManager = layoutManager
         binding.recyclerviewBoxList.adapter = boxChatAdapter
@@ -86,7 +86,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnSearch.setOnClickListener {
-            Toast.makeText(context, "Do Nothing", Toast.LENGTH_SHORT).show()
+
         }
 
         binding.txtBoxAdd.setOnClickListener {
@@ -97,20 +97,32 @@ class HomeFragment : Fragment() {
             builder.setTitle("Input Box Chat name")
             builder.setView(createBoxView)
             builder.setPositiveButton("Create") { _: DialogInterface?, _: Int ->
-                val boxId = createBoxView.findViewById<EditText>(R.id.alert_dialog_data).text.toString()
-                if (!boxId.isNullOrEmpty()) {
+                val boxName = createBoxView.findViewById<EditText>(R.id.alert_dialog_data).text.toString()
+                if (!boxName.isNullOrEmpty()) {
                     lifecycleScope.launch {
-                        homeViewModel.processCreateBoxChat(currentUser, boxId).collect {
+                        homeViewModel.processCreateBoxChat(currentUser, boxName).collect {
                             if (it == true) {
-                                Toast.makeText(context, "Create Box Chat $boxId successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Create Box Chat $boxName successfully", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
+
                 }
             }
 
             val dialog = builder.create()
             dialog.show()
+        }
+
+        lifecycleScope.launch {
+            homeViewModel.getUnseenCountList(currentUser).collect {newUnseenList ->
+                if (!newUnseenList.isNullOrEmpty()) {
+                    unseenList.clear()
+                    unseenList.addAll(newUnseenList)
+
+                    boxChatAdapter.notifyDataSetChanged()
+                }
+            }
         }
 
         lifecycleScope.launch {

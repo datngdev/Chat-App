@@ -6,6 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +18,8 @@ import com.example.chatapp.databinding.FragmentChatDetailBinding
 import com.example.chatapp.datas.models.Message
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreference
 import com.example.chatapp.datas.sharedpreferences.LoginSharedPreferenceImpl
+import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ktx.database
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -22,7 +27,7 @@ class ChatDetailFragment : Fragment() {
     companion object {
         fun newInstance(callBack: ChatDetailCallBack, boxId: String): ChatDetailFragment {
             return ChatDetailFragment().apply {
-                this.callback = callBack
+                this.callBack = callBack
                 this.boxId = boxId
             }
         }
@@ -38,7 +43,7 @@ class ChatDetailFragment : Fragment() {
 
     private val chatDetailViewModel: ChatDetailViewModel by viewModels()
 
-    private var callback: ChatDetailFragment.ChatDetailCallBack? = null
+    private var callBack: ChatDetailFragment.ChatDetailCallBack? = null
     private lateinit var boxId: String
 
     private lateinit var sharedPreference: LoginSharedPreference
@@ -58,18 +63,38 @@ class ChatDetailFragment : Fragment() {
 
         val currentUser = sharedPreference.getCurrentUserId()!!
 
+        lifecycleScope.launch {
+            chatDetailViewModel.listenerCurrentUserRemoved(currentUser, boxId).collect {newState ->
+                if (!newState) {
+                    callBack!!.navigateToHome()
+                }
+            }
+        }
+
+        chatDetailViewModel.resetUnseenCount(currentUser, boxId)
+
+        lifecycleScope.launch {
+            chatDetailViewModel.getBoxOnlineState(currentUser, boxId).collect {newState ->
+                if (newState == true) {
+                    binding.chatActiveState.visibility = View.VISIBLE
+                } else if (newState == false) {
+                    binding.chatActiveState.visibility = View.INVISIBLE
+                }
+            }
+        }
+
         binding.chatTopBackground.setOnClickListener {
-            callback!!.navigateToEditBoxChat(boxId)
+            callBack!!.navigateToEditBoxChat(boxId)
         }
 
         binding.chatBtnBack.setOnClickListener {
-            callback!!.navigateToHome()
+            callBack!!.navigateToHome()
         }
 
         binding.chatBtnSend.setOnClickListener {
             val newMess = binding.chatData.text.toString()
             if (!newMess.isNullOrEmpty()) {
-                chatDetailViewModel.sendMess(currentUser, boxId, newMess)
+                chatDetailViewModel.sendMess(currentUser, boxId, newMess, type = 1)
                 binding.chatData.setText("")
             }
         }
@@ -95,13 +120,20 @@ class ChatDetailFragment : Fragment() {
         val adapter = MessagesAdapter(currentUser, messList, object : MessagesAdapter.MessagesAdapterCallBack {
             override fun loadUserImage(userId: String, img: ImageView) {
                 lifecycleScope.launch {
-                    chatDetailViewModel.loadUserImage(userId).collect {avatarUrl ->
-                        Log.d("avatarUrl", avatarUrl)
+                    chatDetailViewModel.getUserAvatarUrl(userId).collect { avatarUrl ->
                         Glide.with(requireContext())
                             .load(avatarUrl)
                             .centerCrop()
                             .into(img)
                     }
+                }
+            }
+
+            override fun loadDataImage(imageUrl: String, imageView: ImageView) {
+                if (!imageUrl.isNullOrEmpty()) {
+                    Glide.with(requireContext())
+                        .load(imageUrl)
+                        .into(imageView)
                 }
             }
         })
@@ -115,6 +147,24 @@ class ChatDetailFragment : Fragment() {
                 messList.addAll(it.reversed())
                 adapter.notifyDataSetChanged()
             }
+        }
+
+        val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { imageUri ->
+            if (imageUri != null) {
+                lifecycleScope.launch {
+                    chatDetailViewModel.uploadImage(boxId, imageUri).collect {imageUrl ->
+                        if (imageUrl != null) {
+                            chatDetailViewModel.sendMess(currentUser, boxId, imageUrl, type = 2)
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(context, "No Media Selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.chatBtnAttach.setOnClickListener {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     }
 
