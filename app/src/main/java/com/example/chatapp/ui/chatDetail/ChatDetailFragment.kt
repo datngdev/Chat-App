@@ -45,6 +45,7 @@ class ChatDetailFragment : Fragment() {
 
     private var callBack: ChatDetailFragment.ChatDetailCallBack? = null
     private lateinit var boxId: String
+    private lateinit var currentUser: String
 
     private lateinit var sharedPreference: LoginSharedPreference
 
@@ -61,7 +62,7 @@ class ChatDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentUser = sharedPreference.getCurrentUserId()!!
+        currentUser = sharedPreference.getCurrentUserId()!!
 
         lifecycleScope.launch {
             chatDetailViewModel.listenerCurrentUserRemoved(currentUser, boxId).collect {newState ->
@@ -168,6 +169,11 @@ class ChatDetailFragment : Fragment() {
         binding.chatBtnAttach.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        chatDetailViewModel.removeUnseenListener(currentUser, boxId)
     }
 
     override fun onDestroyView() {

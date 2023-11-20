@@ -120,4 +120,8 @@ class ChatDetailViewModel : ViewModel() {
             userRepo.resetUserUnseenCount(userId, boxId)
         }
     }
+
+    fun removeUnseenListener(userId: String, boxId: String) {
+        userRepo.removeUnseenCountListener(userId, boxId)
+    }
 }

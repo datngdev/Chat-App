@@ -300,10 +300,11 @@ class UserRepositoryImpl : UserRepository {
         })
     }
 
+    private lateinit var unseenListener: ValueEventListener
+
     override fun resetUserUnseenCount(userId: String, boxId: String) {
         val unseenRef = userRef.child(userId).child("boxIdList").child(boxId).child("unseenCount")
-
-        unseenRef.addValueEventListener(object : ValueEventListener {
+        unseenListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 unseenRef.setValue(0)
             }
@@ -311,7 +312,12 @@ class UserRepositoryImpl : UserRepository {
             override fun onCancelled(error: DatabaseError) {
                 Log.d("ChatApp", "resetUserUnseenCount Cancelled")
             }
-        })
+        }
+        unseenRef.addValueEventListener(unseenListener)
+    }
+
+    override fun removeUnseenCountListener(userId: String, boxId: String) {
+        userRef.child(userId).child("boxIdList").child(boxId).child("unseenCount").removeEventListener(unseenListener)
     }
 
     override fun getUserUnseenCountList(userId: String): MutableStateFlow<List<Map<String, String>>> {

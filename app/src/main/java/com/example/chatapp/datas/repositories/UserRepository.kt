@@ -24,5 +24,6 @@ interface UserRepository {
     fun getBoxOnlineState(currentUserId: String, boxId: String): MutableStateFlow<Boolean?>
     fun setUserUnseenCount(userId: String, boxId: String, number: Int)
     fun resetUserUnseenCount(userId: String, boxId: String)
+    fun removeUnseenCountListener(userId: String, boxId: String)
     fun getUserUnseenCountList(userId: String): MutableStateFlow<List<Map<String, String>>>
 }
