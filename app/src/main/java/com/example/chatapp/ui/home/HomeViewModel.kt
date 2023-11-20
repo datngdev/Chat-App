@@ -26,33 +26,30 @@ class HomeViewModel : ViewModel() {
                 if (avatarUrl != null) {
                     if (avatarUrl.isNotEmpty()) {
                         boxRepo.createBoxChat(boxName, avatarUrl).collect {boxId ->
-                            if (boxId != null) {
-                                if (boxId.isNotEmpty()) {
-                                    userRepo.addToBox(userId, boxId).collect { addState ->
-                                        if (addState == true) {
-                                            boxRepo.setAdmin(userId, boxId).collect {setAdminState ->
-                                                if (setAdminState == true) {
-                                                    createBoxStatus.value = true
-                                                } else if (setAdminState == false) {
-                                                    createBoxStatus.value = false
-                                                }
+                            if (!boxId.isNullOrEmpty()) {
+                                userRepo.addToBox(userId, boxId).collect { addState ->
+                                    if (addState == true) {
+                                        boxRepo.setAdmin(userId, boxId).collect {setAdminState ->
+                                            if (setAdminState == true) {
+                                                createBoxStatus.value = true
+                                            } else if (setAdminState == false) {
+                                                createBoxStatus.value = false
                                             }
-                                        } else if (addState == false) {
-                                            createBoxStatus.value = false
                                         }
+                                    } else if (addState == false) {
+                                        createBoxStatus.value = false
                                     }
-                                } else {
-                                    createBoxStatus.value = false
                                 }
+                            } else {
+                                createBoxStatus.value = false
                             }
                         }
-                    } else {
-                        createBoxStatus.value = false
                     }
+                } else {
+                    createBoxStatus.value = false
                 }
             }
         }
-
         return createBoxStatus
     }
 

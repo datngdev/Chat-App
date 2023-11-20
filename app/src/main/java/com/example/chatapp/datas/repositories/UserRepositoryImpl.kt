@@ -13,6 +13,7 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Objects
 
 class UserRepositoryImpl : UserRepository {
     private val db = Firebase.database
@@ -156,16 +157,13 @@ class UserRepositoryImpl : UserRepository {
 
     override fun addToBox(userId: String, boxId: String): MutableStateFlow<Boolean?> {
         val addState = MutableStateFlow<Boolean?>(null)
+        
+        var values = mutableMapOf<String, Any>()
+        values["isValid"] = true
+        values["unseenCount"] = 0
 
-        val newBoxRef = userRef.child(userId).child("boxIdList").child(boxId)
-        newBoxRef.child("isValid").setValue(true).addOnSuccessListener {
-            newBoxRef.child("unseenCount").setValue(0).addOnSuccessListener {
-                addState.value = true
-            }.addOnFailureListener {
-                addState.value = false
-            }.addOnCanceledListener {
-                addState.value = false
-            }
+        userRef.child(userId).child("boxIdList").child(boxId).setValue(values).addOnSuccessListener {
+            addState.value = true
         }.addOnFailureListener {
             addState.value = false
         }.addOnCanceledListener {
@@ -330,7 +328,7 @@ class UserRepositoryImpl : UserRepository {
                         user.child("boxIdList").children.forEach {boxNode ->
                             val count = boxNode.child("unseenCount").value.toString()
                             val bId = boxNode.key!!
-                            if (count != "0") {
+                            if (!count.isNullOrEmpty() && count != "0") {
                                 newList.add(mapOf(bId to count))
                             }
                         }
