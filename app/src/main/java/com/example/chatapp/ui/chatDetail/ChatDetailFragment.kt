@@ -71,7 +71,9 @@ class ChatDetailFragment : Fragment() {
             }
         }
 
-        chatDetailViewModel.resetUnseenCount(currentUser, boxId)
+        lifecycleScope.launch {
+            chatDetailViewModel.resetUnseenCount(currentUser, boxId)
+        }
 
         lifecycleScope.launch {
             chatDetailViewModel.getBoxOnlineState(currentUser, boxId).collect {newState ->

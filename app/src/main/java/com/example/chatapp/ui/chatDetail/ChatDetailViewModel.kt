@@ -55,8 +55,10 @@ class ChatDetailViewModel : ViewModel() {
         boxRepo.sendMess(userId, boxId, data, type)
         viewModelScope.launch {
             userRepo.getUserListByBoxId(boxId).collect {userIdList ->
-                userIdList.forEach { userId ->
-                    userRepo.setUserUnseenCount(userId.id, boxId, 1)
+                userIdList.forEach { user ->
+                    if (user.id != userId) {
+                        userRepo.setUserUnseenCount(user.id, boxId, 1)
+                    }
                 }
             }
         }
@@ -114,6 +116,8 @@ class ChatDetailViewModel : ViewModel() {
     }
 
     fun resetUnseenCount(userId: String, boxId: String) {
-        userRepo.resetUserUnseenCount(userId, boxId)
+        viewModelScope.launch {
+            userRepo.resetUserUnseenCount(userId, boxId)
+        }
     }
 }
